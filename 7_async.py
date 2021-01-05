@@ -26,7 +26,39 @@ def main():
     print('time >\tt', time() - t0)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 
 #################################################
+import asyncio
+import aiohttp
+
+
+def write_image(data):
+    filename = f'file-{int(time() * 1000)}.jpg'
+    with open(filename, 'wb') as file:
+        file.write(data)
+
+
+async def fetch_content(url, session):
+    async with session.get(url, allow_redirects=True) as response:
+        data = await response.read()
+        write_image(data)
+
+
+async def async_main():
+
+    tasks = []
+
+    async with aiohttp.ClientSession() as session:
+        for i in range(10):
+            task = asyncio.create_task(fetch_content(URL, session))
+            tasks.append(task)
+        
+        await asyncio.gather(*tasks)
+
+
+if __name__ == "__main__":
+    t0 = time()
+    asyncio.run(async_main())
+    print('time >\t', time() - t0)
